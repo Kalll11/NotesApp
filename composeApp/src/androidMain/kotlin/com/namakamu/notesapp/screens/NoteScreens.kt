@@ -17,11 +17,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.imePadding
 import org.koin.compose.koinInject
 import com.namakamu.notesapp.platform.NetworkMonitor
 import com.namakamu.notesapp.viewmodel.NoteViewModel
-import com.namakamu.notesapp.db.Note // 👉 Kata 'db' yang dobel sudah dihapus
+import com.namakamu.notesapp.db.Note
 
 // ==========================================
 // 1. DAFTAR CATATAN (TAB NOTES) + NETWORK BANNER
@@ -180,7 +182,13 @@ fun AddNoteScreen(viewModel: NoteViewModel, onNavigateBack: () -> Unit) {
     var title by remember { mutableStateOf("") }
     var content by remember { mutableStateOf("") }
 
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState())
+            .imePadding()
+    ) {
         Text("Tambah Catatan", style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -208,16 +216,56 @@ fun AddNoteScreen(viewModel: NoteViewModel, onNavigateBack: () -> Unit) {
 fun NoteDetailScreen(noteId: Int, viewModel: NoteViewModel, onNavigateBack: () -> Unit, onNavigateToEdit: (Int) -> Unit) {
     val note = viewModel.getNoteById(noteId)
 
+    val isSummarizing by viewModel.isSummarizing
+    val summaryState by viewModel.summaryState
+
+    DisposableEffect(Unit) { onDispose { viewModel.clearSummary() } }
+
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         if (note != null) {
-            Text(note.title, style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+            // 👇 1. BUNGKUS TEKS DALAM COLUMN BARU YANG BISA DI-SCROLL 👇
+            Column(
+                modifier = Modifier
+                    .weight(1f) // Memaksa area teks mengambil seluruh sisa ruang kosong
+                    .verticalScroll(rememberScrollState()) // Menambahkan kemampuan scroll
+            ) {
+                Text(note.title, style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(note.content, style = MaterialTheme.typography.bodyLarge)
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // KOTAK RINGKASAN AI
+                if (isSummarizing) {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                    Text("AI sedang membaca catatan Anda...", modifier = Modifier.align(Alignment.CenterHorizontally))
+                } else if (summaryState != null) {
+                    Surface(
+                        color = MaterialTheme.colorScheme.primaryContainer,
+                        shape = MaterialTheme.shapes.medium,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text("✨ Ringkasan AI", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                            Spacer(modifier = Modifier.height(8.dp))
+                            if (summaryState!!.isSuccess) {
+                                Text(summaryState!!.summary, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                            } else {
+                                Text(summaryState!!.errorMessage ?: "Error", color = MaterialTheme.colorScheme.error)
+                            }
+                        }
+                    }
+                }
+            } // 👈 Tutup area scroll di sini
+
             Spacer(modifier = Modifier.height(16.dp))
-            Text(note.content, style = MaterialTheme.typography.bodyLarge)
 
-            Spacer(modifier = Modifier.weight(1f))
-
+            // 👇 2. AREA TOMBOL BAWAH (TETAP STATIS TIDAK IKUT DI-SCROLL) 👇
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedButton(onClick = onNavigateBack, modifier = Modifier.weight(1f)) { Text("Kembali") }
+                Button(onClick = { viewModel.generateSummary(note.content) }, modifier = Modifier.weight(1.5f)) {
+                    Text("✨ Ringkas (AI)")
+                }
                 Button(onClick = { onNavigateToEdit(noteId) }, modifier = Modifier.weight(1f)) { Text("Edit") }
             }
         } else {
@@ -237,7 +285,13 @@ fun EditNoteScreen(noteId: Int, viewModel: NoteViewModel, onNavigateBack: () -> 
     var title by remember { mutableStateOf(note?.title ?: "") }
     var content by remember { mutableStateOf(note?.content ?: "") }
 
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState())
+            .imePadding()
+    ) {
         Text("Edit Catatan", style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(16.dp))
 

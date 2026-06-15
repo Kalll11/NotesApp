@@ -2,7 +2,6 @@ package com.namakamu.notesapp.platform
 
 import android.os.Build
 
-// Implementasi khusus Android
 actual class DeviceInfo actual constructor() {
     actual fun getDeviceName(): String {
         return Build.MODEL

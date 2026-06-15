@@ -1,5 +1,9 @@
 package com.namakamu.notesapp.viewmodel
 
+import com.namakamu.notesapp.ai.AIRepository
+import com.namakamu.notesapp.ai.SummaryResult
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.State
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.namakamu.notesapp.data.NoteRepository
@@ -14,15 +18,17 @@ sealed class UiState {
     data class Content(val notes: List<Note>) : UiState()
 }
 
-// 👉 Menggunakan ViewModel biasa, NoteRepository akan disuntikkan otomatis oleh Koin!
-class NoteViewModel(private val repository: NoteRepository) : ViewModel() {
+// 👉 PERUBAHAN 1: Menambahkan 'private val aiRepository: AIRepository' di sini
+class NoteViewModel(
+    private val repository: NoteRepository,
+    private val aiRepository: AIRepository
+) : ViewModel() {
 
     // Untuk fitur Search (Syarat Tugas No. 3)
     private val _searchQuery = MutableStateFlow("")
     val searchQuery = _searchQuery.asStateFlow()
 
     // 1. Ambil data LANGSUNG dari SQLite (Syarat Tugas No. 5 - Offline First)
-    // Karena tidak ada SettingsManager, kita atur default urutannya: Catatan Terbaru di atas (isDesc = true)
     @OptIn(ExperimentalCoroutinesApi::class)
     val notes: StateFlow<List<Note>> = _searchQuery
         .flatMapLatest { query ->
@@ -86,5 +92,33 @@ class NoteViewModel(private val repository: NoteRepository) : ViewModel() {
             // Memanggil fungsi delete dari repository (konversi Int ke Long)
             repository.deleteNote(id.toLong())
         }
+    }
+
+    // ====================================================================
+    // 👉 PERUBAHAN 2: KODE UNTUK FITUR AI GENERATE SUMMARY
+    // ====================================================================
+
+    // State untuk UI Ringkasan
+    private val _summaryState = mutableStateOf<SummaryResult?>(null)
+    val summaryState: State<SummaryResult?> = _summaryState
+
+    private val _isSummarizing = mutableStateOf(false)
+    val isSummarizing: State<Boolean> = _isSummarizing
+
+    // Fungsi untuk memanggil AI
+    fun generateSummary(noteContent: String) {
+        viewModelScope.launch {
+            _isSummarizing.value = true
+            _summaryState.value = null // Reset ringkasan lama
+
+            val result = aiRepository.summarizeNote(noteContent)
+            _summaryState.value = result
+
+            _isSummarizing.value = false
+        }
+    }
+
+    fun clearSummary() {
+        _summaryState.value = null
     }
 }

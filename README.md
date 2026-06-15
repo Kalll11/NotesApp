@@ -1,35 +1,47 @@
-This is a Kotlin Multiplatform project targeting Android, iOS.
+# 📝 NotesApp - Integrasi AI
 
-* [/composeApp](./composeApp/src) is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - [commonMain](./composeApp/src/commonMain/kotlin) is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    the [iosMain](./composeApp/src/iosMain/kotlin) folder would be the right place for such calls.
-    Similarly, if you want to edit the Desktop (JVM) specific part, the [jvmMain](./composeApp/src/jvmMain/kotlin)
-    folder is the appropriate location.
+Aplikasi pencatatan (NotesApp) berbasis Android yang telah diintegrasikan dengan teknologi *Generative AI* untuk membantu pengguna merangkum catatan panjang secara instan. Proyek ini dikembangkan untuk memenuhi Tugas Praktikum Pengembangan Aplikasi Mobile.
 
-* [/iosApp](./iosApp/iosApp) contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform,
-  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
+## ✨ Fitur AI yang Diimplementasikan: **Content Summarization**
+Aplikasi ini menggunakan **Google Gemini API (Model: `gemini-2.5-flash`)** untuk memproses dan menghasilkan ringkasan cerdas dari isi catatan pengguna. Fitur ini dapat diakses langsung melalui tombol "✨ Ringkas (AI)" pada halaman Detail Catatan.
 
-### Build and Run Android Application
+### 🎯 Pemenuhan Kriteria Rubrik Penilaian:
 
-To build and run the development version of the Android app, use the run configuration from the run widget
-in your IDE’s toolbar or build it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:assembleDebug
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:assembleDebug
-  ```
-
-### Build and Run iOS Application
-
-To build and run the development version of the iOS app, use the run configuration from the run widget
-in your IDE’s toolbar or open the [/iosApp](./iosApp) directory in Xcode and run it from there.
+* **1. AI Integration & Architecture**
+  Integrasi API dilakukan dengan arsitektur yang rapi menggunakan `Ktor HttpClient` untuk lapisan jaringan dan `Koin` untuk *Dependency Injection* (DI).
+* **2. Prompt Engineering**
+  Sistem *prompt* dirancang secara spesifik (well-designed) untuk memastikan keluaran AI selalu relevan, ringkas, dan terstruktur. *(Prompt diinstruksikan untuk bertindak sebagai asisten cerdas dan membatasi ringkasan maksimum 3 paragraf).*
+* **3. Proper Error Handling**
+  Aplikasi memiliki penanganan *error* yang tangguh (graceful degradation):
+  - Menangkap *error* jaringan (No Internet).
+  - Menangani JSON *Serialization Exception* jika API mengembalikan respons tak terduga.
+  - Memberikan pesan UI yang jelas jika kuota API habis (Rate Limit) atau *API Key* tidak valid, sehingga aplikasi **tidak mengalami force close**.
+* **4. UI/UX yang Responsif**
+  - Terdapat *Loading State* (`CircularProgressIndicator`) saat sistem sedang menunggu balasan dari AI.
+  - UI menggunakan `verticalScroll` sehingga pengguna tetap nyaman membaca ringkasan teks yang panjang.
 
 ---
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
+## 🚀 Cara Menjalankan Aplikasi
+
+Agar fitur AI dapat berjalan di perangkat/emulator Anda, Anda **WAJIB** memasukkan API Key Gemini milik Anda sendiri. Aplikasi ini sengaja tidak menyertakan API Key di dalam *repository* publik demi keamanan kredensial.
+
+**Langkah-langkah setup:**
+1. Dapatkan *API Key* gratis dari [Google AI Studio](https://aistudio.google.com/app/apikey).
+2. *Clone repository* ini ke komputer Anda dan buka menggunakan Android Studio.
+3. Di dalam Android Studio, buka file `local.properties` (berada di folder paling luar/root proyek).
+4. Tambahkan baris kode berikut di bagian paling bawah:
+   ```properties
+   GEMINI_API_KEY=TulisApiKeyAndaDisiniTanpaTandaKutip
+5. Lakukan Sync Project with Gradle Files.
+6. Build dan Run aplikasi ke Emulator atau HP fisik Anda.
+
+---
+
+## 🛠️ Teknologi yang Digunakan
+
+1. Kotlin
+2. Jetpack Compose (UI)
+3. Ktor (Network/HTTP Client)
+4. Kotlinx Serialization (JSON Parsing)
+5. Koin (Dependency Injection)
