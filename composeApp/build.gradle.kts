@@ -69,6 +69,18 @@ kotlin {
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+            implementation(kotlin("test")) // kotlin.test assertions
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+            implementation("app.cash.turbine:turbine:1.0.0") // Flow testing 
+            implementation("io.mockk:mockk:1.13.9") // Mocking (JVM only)
+            implementation("io.insert-koin:koin-test:3.5.3") // Koin testing
+        }
+
+        val androidInstrumentedTest by getting {
+            dependencies {
+                implementation("androidx.compose.ui:ui-test-junit4:1.6.0")
+                implementation("androidx.test.ext:junit:1.1.5")
+            }
         }
     }
 }
@@ -78,7 +90,6 @@ android {
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        // Konfigurasi pembacaan API Key dari local.properties
         val localProps = project.rootProject.file("local.properties")
         val properties = Properties()
         if (localProps.exists()) {
@@ -91,6 +102,8 @@ android {
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
+
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildFeatures {
@@ -106,6 +119,9 @@ android {
         getByName("release") {
             isMinifyEnabled = false
         }
+        getByName("debug") {
+            enableUnitTestCoverage = true
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
@@ -115,6 +131,7 @@ android {
 
 dependencies {
     debugImplementation(libs.compose.uiTooling)
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.0")
 }
 
 sqldelight {

@@ -8,7 +8,7 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 
 class AIRepository(private val client: HttpClient) {
-    private val baseUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=MASUKKAN_API_KEY_ANDA_DISINI"
+    private val baseUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=MASUKKAN_API_KEY_MILIK_ANDA_DISINI"
 
     suspend fun summarizeNote(noteContent: String): SummaryResult {
         return try {

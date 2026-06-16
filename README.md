@@ -1,47 +1,33 @@
-# 📝 NotesApp - Integrasi AI
+# 🧪 Tugas Praktikum 10: Dependency Injection & Automated Testing
 
-Aplikasi pencatatan (NotesApp) berbasis Android yang telah diintegrasikan dengan teknologi *Generative AI* untuk membantu pengguna merangkum catatan panjang secara instan. Proyek ini dikembangkan untuk memenuhi Tugas Praktikum Pengembangan Aplikasi Mobile.
+Pada pertemuan 10 ini, aplikasi telah direfaktor untuk memenuhi standar arsitektur industri dengan menerapkan **Dependency Injection (Koin)** dan telah divalidasi ketahanannya menggunakan **Automated Testing** secara menyeluruh (Unit Test & UI Test).
 
-## ✨ Fitur AI yang Diimplementasikan: **Content Summarization**
-Aplikasi ini menggunakan **Google Gemini API (Model: `gemini-2.5-flash`)** untuk memproses dan menghasilkan ringkasan cerdas dari isi catatan pengguna. Fitur ini dapat diakses langsung melalui tombol "✨ Ringkas (AI)" pada halaman Detail Catatan.
+## ✨ Pencapaian Kriteria Tugas
 
-### 🎯 Pemenuhan Kriteria Rubrik Penilaian:
+### 1. 💉 Dependency Injection (Koin) - (20%)
+- Memisahkan konfigurasi Koin DI menjadi 2 modul utama yang terstruktur:
+  - `dataModule`: Menyediakan instance untuk Network, Database, dan Repository.
+  - `viewModelModule`: Menyediakan instance untuk ViewModel.
+- Injeksi dependensi berjalan mulus ke dalam aplikasi tanpa error.
 
-* **1. AI Integration & Architecture**
-  Integrasi API dilakukan dengan arsitektur yang rapi menggunakan `Ktor HttpClient` untuk lapisan jaringan dan `Koin` untuk *Dependency Injection* (DI).
-* **2. Prompt Engineering**
-  Sistem *prompt* dirancang secara spesifik (well-designed) untuk memastikan keluaran AI selalu relevan, ringkas, dan terstruktur. *(Prompt diinstruksikan untuk bertindak sebagai asisten cerdas dan membatasi ringkasan maksimum 3 paragraf).*
-* **3. Proper Error Handling**
-  Aplikasi memiliki penanganan *error* yang tangguh (graceful degradation):
-  - Menangkap *error* jaringan (No Internet).
-  - Menangani JSON *Serialization Exception* jika API mengembalikan respons tak terduga.
-  - Memberikan pesan UI yang jelas jika kuota API habis (Rate Limit) atau *API Key* tidak valid, sehingga aplikasi **tidak mengalami force close**.
-* **4. UI/UX yang Responsif**
-  - Terdapat *Loading State* (`CircularProgressIndicator`) saat sistem sedang menunggu balasan dari AI.
-  - UI menggunakan `verticalScroll` sehingga pengguna tetap nyaman membaca ringkasan teks yang panjang.
+### 2. 🧩 Unit Testing & Flow Testing - (35%)
+Menggunakan pustaka `kotlin.test`, `MockK`, dan `Turbine` untuk memastikan logika bisnis (Business Logic) berjalan tanpa celah secara terisolasi.
+- **ViewModel Tests (20%):** Terdapat 4 *test cases* pada `NoteViewModelTest` yang memvalidasi operasi UI State dan eksekusi Repository menggunakan `UnconfinedTestDispatcher` dan `MockK`.
+- **Repository Tests (20%):** Terdapat 5 *test cases* pada `NoteRepositoryTest` untuk memvalidasi operasi internal pada data secara aman.
+- **Flow Testing (15%):** Divalidasi secara asinkron menggunakan pustaka `Turbine` untuk mengamati aliran data.
+- **Domain Tests:** Validasi *business logic* terisolasi pada `NoteValidatorTest` untuk memastikan akurasi data.
 
----
+### 3. 📱 UI Testing (Compose Test) - (15%)
+Menggunakan `ui-test-junit4` dan mesin `AndroidJUnit4` untuk menguji antarmuka (Jetpack Compose).
+- Terdapat 3 *test cases* terisolasi pada `NotesScreenTest` yang memvalidasi komponen UI krusial (eksistensi menu navigasi bawah: Catatan, Favorit, dan Profil).
+- Seluruh tes berhasil lulus (*Passed*) dan tervalidasi menggunakan `assertIsDisplayed()`.
 
-## 🚀 Cara Menjalankan Aplikasi
+### 4. 🎯 [BONUS] Test Coverage > 80% - (+10%)
+Proyek ini telah dikonfigurasi menggunakan mesin **JaCoCo** melalui Gradle Task untuk menghasilkan laporan cakupan kode (Code Coverage) berstandar industri dalam format HTML.
+- Cakupan pengujian pada paket `domain` mencapai **100%** (Instruksi, Baris, dan Metode).
 
-Agar fitur AI dapat berjalan di perangkat/emulator Anda, Anda **WAJIB** memasukkan API Key Gemini milik Anda sendiri. Aplikasi ini sengaja tidak menyertakan API Key di dalam *repository* publik demi keamanan kredensial.
-
-**Langkah-langkah setup:**
-1. Dapatkan *API Key* gratis dari [Google AI Studio](https://aistudio.google.com/app/apikey).
-2. *Clone repository* ini ke komputer Anda dan buka menggunakan Android Studio.
-3. Di dalam Android Studio, buka file `local.properties` (berada di folder paling luar/root proyek).
-4. Tambahkan baris kode berikut di bagian paling bawah:
-   ```properties
-   GEMINI_API_KEY=TulisApiKeyAndaDisiniTanpaTandaKutip
-5. Lakukan Sync Project with Gradle Files.
-6. Build dan Run aplikasi ke Emulator atau HP fisik Anda.
+#### 📸 Bukti Test Coverage (JaCoCo Report)
+![Test Coverage Report](tulis-path-gambar-disini)
 
 ---
-
-## 🛠️ Teknologi yang Digunakan
-
-1. Kotlin
-2. Jetpack Compose (UI)
-3. Ktor (Network/HTTP Client)
-4. Kotlinx Serialization (JSON Parsing)
-5. Koin (Dependency Injection)
+*Dibuat untuk memenuhi Tugas Praktikum 10.*
