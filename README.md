@@ -45,3 +45,9 @@ Agar fitur AI dapat berjalan di perangkat/emulator Anda, Anda **WAJIB** memasukk
 3. Ktor (Network/HTTP Client)
 4. Kotlinx Serialization (JSON Parsing)
 5. Koin (Dependency Injection)
+
+---
+
+## 📸 Fitur AI Content Summarization
+
+<img width="177" height="317" alt="Screenshot 2026-06-15 193755" src="https://github.com/user-attachments/assets/af2f08d6-9c1d-4598-b1ec-92c84e860370" />
