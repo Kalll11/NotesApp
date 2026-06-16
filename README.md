@@ -27,7 +27,7 @@ Proyek ini telah dikonfigurasi menggunakan mesin **JaCoCo** melalui Gradle Task 
 - Cakupan pengujian pada paket `domain` mencapai **100%** (Instruksi, Baris, dan Metode).
 
 #### 📸 Bukti Test Coverage (JaCoCo Report)
-![Test Coverage Report](tulis-path-gambar-disini)
+![Test Coverage Report](<img width="767" height="17" alt="Screenshot 2026-06-16 114535" src="https://github.com/user-attachments/assets/4a853362-333e-4232-a7e0-56b24cb90d69" />)
 
 ---
 *Dibuat untuk memenuhi Tugas Praktikum 10.*
